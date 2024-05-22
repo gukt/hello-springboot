@@ -1,1 +1,29 @@
-spring.application.name=hello-springboot
+app:
+  db:
+    host: 1.94.99.241
+    port: 13306
+    username: root
+    password: 1234+asdf
+    catalog: test
+  dataLocation: /data/${spring.application.name}
+  upload-dir: ${app.dataLocation}/upload
+---
+spring:
+  application:
+    name: hello-spring
+  datasource:
+    username: ${app.db.username}
+    password: ${app.db.password}
+    url: jdbc:mysql://${app.db.host}:${app.db.port}/${app.db.catalog}?createDatabaseIfNotExist=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    hikari:
+      connection-init-sql: SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-test-query: SELECT 1
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
