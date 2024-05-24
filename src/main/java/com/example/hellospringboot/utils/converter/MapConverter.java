@@ -1,4 +1,4 @@
-package com.example.hellospringboot.utils;
+package com.example.hellospringboot.utils.converter;
 
 import jakarta.persistence.Converter;
 
@@ -9,7 +9,7 @@ import java.util.Map;
 public class MapConverter<V> extends JsonConverter<Map<String, V>> {
 
     @Override
-    protected Map<String, V> defaultEntityValue() {
+    protected Map<String, V> defaultEntityAttributeValue() {
         return new HashMap<>();
     }
 
@@ -17,4 +17,8 @@ public class MapConverter<V> extends JsonConverter<Map<String, V>> {
     protected String defaultColumnValue() {
         return "{}";
     }
+
+    public static class Int extends MapConverter<Integer> {}
+
+    public static class Long extends MapConverter<Long> {}
 }

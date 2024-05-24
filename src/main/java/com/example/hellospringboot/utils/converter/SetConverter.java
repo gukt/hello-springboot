@@ -1,4 +1,4 @@
-package com.example.hellospringboot.utils;
+package com.example.hellospringboot.utils.converter;
 
 import jakarta.persistence.Converter;
 
@@ -9,7 +9,7 @@ import java.util.Set;
 public class SetConverter<E> extends JsonConverter<Set<E>> {
 
     @Override
-    protected Set<E> defaultEntityValue() {
+    protected Set<E> defaultEntityAttributeValue() {
         return new HashSet<>();
     }
 
@@ -17,4 +17,8 @@ public class SetConverter<E> extends JsonConverter<Set<E>> {
     protected String defaultColumnValue() {
         return "[]";
     }
+
+    public static class Int extends SetConverter<Integer> {}
+
+    public static class Long extends SetConverter<Long> {}
 }

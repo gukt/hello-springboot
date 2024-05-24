@@ -1,4 +1,4 @@
-package com.example.hellospringboot.utils;
+package com.example.hellospringboot.utils.converter;
 
 /**
  * GenericConverter class

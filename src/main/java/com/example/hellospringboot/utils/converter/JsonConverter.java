@@ -1,4 +1,4 @@
-package com.example.hellospringboot.utils;
+package com.example.hellospringboot.utils.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -10,7 +10,10 @@ import jakarta.persistence.Converter;
 public class JsonConverter<T> implements AttributeConverter<T, String> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final TypeReference<T> typeReference = new TypeReference<>() {};
+    protected TypeReference<T> typeReference = new TypeReference<>() {};
+
+    public JsonConverter() {
+    }
 
     @Override
     public String convertToDatabaseColumn(T attribute) {
@@ -27,7 +30,7 @@ public class JsonConverter<T> implements AttributeConverter<T, String> {
     @Override
     public T convertToEntityAttribute(String dbData) {
         if (dbData == null || dbData.trim().isEmpty() || "null".equalsIgnoreCase(dbData)) {
-            return defaultEntityValue();
+            return defaultEntityAttributeValue();
         }
         try {
             return objectMapper.readValue(dbData, typeReference);
@@ -36,7 +39,7 @@ public class JsonConverter<T> implements AttributeConverter<T, String> {
         }
     }
 
-    protected T defaultEntityValue() {
+    protected T defaultEntityAttributeValue() {
         return null;
     }
 

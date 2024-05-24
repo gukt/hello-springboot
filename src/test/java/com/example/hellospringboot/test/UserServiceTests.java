@@ -55,17 +55,13 @@ public class UserServiceTests {
     //    }
 
     @Test
-    public void testJsonFields() {
+    public void testJsonConverters() {
         userRepository.findById(1L).ifPresentOrElse(user -> {
             System.out.println("user = " + user);
-            System.out.println("user.getAttributes() = " + user.getAttributes());
-            System.out.println("user.getItems() = " + user.getItems());
-            System.out.println("user.getTags() = " + user.getTags());
-
-            for (Integer key : user.getNumbers()) {
-                System.out.println("key = " + key);
+            for (Integer item : user.getIntList()) {
+                System.out.println(item);
             }
-        }, () -> System.out.println("User not found"));
+        }, () -> System.out.println("👉 User not found"));
     }
 
     @Test
