@@ -26,7 +26,7 @@ public abstract class AuditableSoftDeletableEntity<T> extends AuditableEntity<T>
 
     @Builder.Default
     @Getter(AccessLevel.NONE)
-    @Column(nullable = false, columnDefinition = "bit default 0")
+    @Column(nullable = false, columnDefinition = "bit(1) default 0")
     protected Boolean deleted = false;
 
     public boolean isDeleted() {

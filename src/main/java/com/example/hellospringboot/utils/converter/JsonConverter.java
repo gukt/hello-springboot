@@ -4,15 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
 
-@Converter
+// @Converter
 public class JsonConverter<T> implements AttributeConverter<T, String> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     protected TypeReference<T> typeReference = new TypeReference<>() {};
 
-    public JsonConverter() {
+    JsonConverter() {
+        System.out.println("JsonConverter init.");
     }
 
     @Override

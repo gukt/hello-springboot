@@ -2,6 +2,7 @@ package com.example.hellospringboot.domain;
 
 import com.example.hellospringboot.domain.base.AuditableSoftDeletableEntity;
 import com.example.hellospringboot.utils.Snowflake;
+import com.example.hellospringboot.utils.converter.JsonConverter;
 import com.example.hellospringboot.utils.converter.ListConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -53,13 +54,20 @@ public class User extends AuditableSoftDeletableEntity<Long> {
     @Column(columnDefinition = "json")
     private List<Long> longList;
 
-    //    @Convert(converter = ListConverter.class)
-    //    @Column(columnDefinition = "json")
-    //    private List<String> stringList;
+    @Convert(converter = JsonConverter.class)
+    @Column(columnDefinition = "json")
+    private List<String> stringList;
 
-    @Convert(converter = ListConverter.class)
+    @Convert(converter = JsonConverter.class)
     @Column(columnDefinition = "json")
     private List<?> objectList;
+
+    // 使用 JsonConverter 也是支持的，只是有一些限制，比如它不支持默认值。
+    // 而如果使用 ListConverter，则默认值是空数组 []，这样就不会出现空指针异常。
+    // 如果你想要更精确的解析，可以使用 ListConverter.Int 或 ListConverter.Long。
+    @Convert(converter = JsonConverter.class)
+    @Column(columnDefinition = "json")
+    private List<Object> objectList2;
 
     //    @Convert(converter = JsonConverter.class)
     //    @Column(columnDefinition = "json")

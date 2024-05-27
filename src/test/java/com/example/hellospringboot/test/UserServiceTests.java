@@ -12,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,17 +62,84 @@ public class UserServiceTests {
     public void testJsonConverters() {
         userRepository.findById(1L).ifPresentOrElse(user -> {
             System.out.println("user = " + user);
-            for (Integer item : user.getIntList()) {
-                System.out.println(item);
-            }
+
+            printFieldGenericType("intList");
+            // printFieldGenericType("stringList");
+            // printFieldGenericType("objectList");
+
+            user.getIntList().forEach(item -> System.out.println(item + ":" + item.getClass().getName()));
+            user.getLongList().forEach(item -> System.out.println(item + ":" + item.getClass().getName()));
+            user.getStringList().forEach(item -> System.out.println(item + ":" + item.getClass().getName()));
+            user.getObjectList().forEach(item -> System.out.println(item + ":" + item.getClass().getName()));
+            user.getObjectList2().forEach(item -> System.out.println(item + ":" + item.getClass().getName()));
         }, () -> System.out.println("👉 User not found"));
+    }
+
+    private void printFieldGenericType(String fieldName) {
+        Field field = Arrays.stream(User.class.getDeclaredFields())
+                .filter(f -> f.getName().equals(fieldName))
+                .findFirst()
+                .orElseThrow();
+
+        Type genericType = field.getGenericType();
+
+        if (genericType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) genericType;
+            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+            for (Type type : actualTypeArguments) {
+                System.out.println("Generic type: " + type);
+            }
+        }
+    }
+
+    @Test
+    public void test1() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = "[\"111\", \"2\", \"3\"]";
+        try {
+            // 当需要转换为数值类型时，如果元素的值超出了指定的泛型类型值，则会抛出异常，比如：
+            // com.fasterxml.jackson.databind.exc.InvalidFormatException: Cannot deserialize value of type `java.lang.Integer` from String "1111111111111": Overflow: numeric value (1111111111111) out of range of `java.lang.Integer` (-2147483648 -2147483647)
+            // 如果元素的值均不超过指定的泛型类型值，则可以正常转换，比如：["1", "2", "3"] -> [1, 2, 3] 可以顺利地转换为以下类型：
+            // List<Byte> OK -> List<Byte>
+            // List<Short> OK -> List<Short>
+            // List<Integer> OK -> List<Integer>
+            // List<Long> OK -> List<Long>
+            // List<Double> OK -> List<Double>
+            // List<Float> OK -> List<Float>
+            // List<BigInteger> OK -> List<BigInteger>
+            // List<BigDecimal> OK -> List<BigDecimal>
+            //
+            // 👉🏻 List<Number>
+            // List<Number> OK -> List<Number>,
+            // 此时如果数值比较小就会转换为 Integer，如果比较大就会转换为 Long，所以 List<Number> 中并不是每个元素的类型都是一样的。而是根据数值的大小来决定的。
+            // 例如：[1111111111111, 2, 3]
+            // 1111111111111:java.lang.Long
+            // 2:java.lang.Integer
+            // 3:java.lang.Integer
+            //
+            // 当需要转换 Character 时，元素就必须是单个字符，否则会抛出异常：
+            // com.fasterxml.jackson.databind.exc.InvalidFormatException: Cannot deserialize value of type `java.lang.Character` from String "111": Expected either Integer value code or 1-character String
+            // List<Character> OK -> List<Character>
+            //
+            // 👉🏻 List<String>, List<?>, List<Object>:
+            // 因为原始数据为 String，所以以下几种类型都被解析成 List<String>
+            // List<String> OK -> List<String>
+            // List<?> OK -> List<String>
+            // List<Object> OK -> List<String>
+            List<Character> numbers = objectMapper.readValue(json, new TypeReference<>() {});
+            System.out.println(numbers);
+            numbers.forEach(item -> System.out.println(item + ":" + item.getClass().getName()));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void testJson() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "[\"1\", \"2\", \"3\"]";
-        List<Integer> numbers = objectMapper.readValue(json, new TypeReference<List<Integer>>() {});
+        List<Integer> numbers = objectMapper.readValue(json, new TypeReference<List<Integer>>() {
+        });
         System.out.println(numbers);
     }
 

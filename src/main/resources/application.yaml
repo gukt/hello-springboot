@@ -5,7 +5,7 @@ app:
     username: root
     password: 1234+asdf
     catalog: test
-  dataLocation: /data/${spring.application.name}
+  dataLocation: /Users/gukt/data/hello-spring
   upload-dir: ${app.dataLocation}/upload
 ---
 spring:
@@ -23,7 +23,32 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
+logging:
+  # 如果不想在日志中打印应用名称，可以设置 logging.include-application-name 为 false
+  # https://docs.spring.io/spring-boot/reference/features/logging.html#features.logging.log-format
+  include-application-name: false
+
+  level:
+    # 以下日志级别默认都是 info，这里写出来只是为了方便查看与修改
+    web: debug
+  #    web: info
+  #    sql: info
+  # 设置日志记录文件
+  file:
+    name: ${app.dataLocation}/logs/${spring.application.name}.log
+    # 设置要使用的日志配置文件
+    # config: classpath:logback-spring.xml
+
+  # 设置控制台日志输出格式
+  # default: %clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}
+  pattern:
+    # 最简单的日志输出格式：时间、线程、日志级别、logger 名称（一般使用类名）、日志消息
+    console: "[%clr(%5p)] %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n"
+#    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -file:%F -line:%L -class:%class -class-full:%C{50} -log-level:%p -duration-since-bootstrap:%r  - %msg%n"
+#    console: "%d{HH:mm:ss.SSS} [%thread] %clr(${LOG_LEVEL_PATTERN:-%5p}) %logger{36} - %msg%n"
+debug: false
+
