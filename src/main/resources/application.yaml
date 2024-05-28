@@ -8,6 +8,7 @@ app:
   dataLocation: /Users/gukt/data/hello-spring
   upload-dir: ${app.dataLocation}/upload
 ---
+debug: false
 spring:
   application:
     name: hello-spring
@@ -27,28 +28,29 @@ spring:
     properties:
       hibernate:
         format_sql: true
+# https://docs.spring.io/spring-boot/reference/features/logging.html
 logging:
-  # 如果不想在日志中打印应用名称，可以设置 logging.include-application-name 为 false
-  # https://docs.spring.io/spring-boot/reference/features/logging.html#features.logging.log-format
-  include-application-name: false
-
-  level:
-    # 以下日志级别默认都是 info，这里写出来只是为了方便查看与修改
-    web: debug
-  #    web: info
-  #    sql: info
-  # 设置日志记录文件
   file:
-    name: ${app.dataLocation}/logs/${spring.application.name}.log
-    # 设置要使用的日志配置文件
-    # config: classpath:logback-spring.xml
-
-  # 设置控制台日志输出格式
-  # default: %clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}
+    name: app
+    path: ${app.dataLocation}/logs
+  threshold:
+    console: debug
+    file: debug
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 100GB
+  level:
+    root: info
+    web: info
+    sql: error
+    com.example: debug
   pattern:
-    # 最简单的日志输出格式：时间、线程、日志级别、logger 名称（一般使用类名）、日志消息
-    console: "[%clr(%5p)] %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n"
-#    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -file:%F -line:%L -class:%class -class-full:%C{50} -log-level:%p -duration-since-bootstrap:%r  - %msg%n"
-#    console: "%d{HH:mm:ss.SSS} [%thread] %clr(${LOG_LEVEL_PATTERN:-%5p}) %logger{36} - %msg%n"
-debug: false
+    # 去掉默认 Pattern 中的 PID，Application Name, 以及仅显示日期部分，减少信息冗余。
+    # 默认 Pattern 在 classpath:org/springframework/boot/logging/logback/defaults.xml 文件中定义，也可以打开下列地址查看：
+    # https://github.com/spring-projects/spring-boot/blob/v3.3.0/spring-boot-project/spring-boot/src/main/resources/org/springframework/boot/logging/logback/defaults.xml
+    # MDC support: https://logback.qos.ch/manual/mdc.html
 
+    console: "%clr(%d{HH:mm:ss.SSS}){faint} [%thread] %clr(%-5level) %clr([%logger{36}]){cyan} %clr(%X{userId}){magenta} %clr(%X{username}){blue} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} %X{userId} %X{username} - %msg%n"

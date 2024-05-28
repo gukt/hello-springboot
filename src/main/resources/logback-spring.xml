@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+开启自动扫描，默认扫描间隔为 60 秒。
+参考：
+- https://docs.spring.io/spring-boot/reference/features/logging.html#features.logging.custom-log-configuration
+- https://github.com/spring-projects/spring-boot/blob/v3.3.0/spring-boot-project/spring-boot/src/main/resources/org/springframework/boot/logging/logback/defaults.xml
+- http://logback.qos.ch/manual/index.html
+-->
+<configuration>
+    <!-- 包含 Spring Boot 提供的默认配置 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- 输出到控制台 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${FILE_LOG_THRESHOLD}</level>
+        </filter>
+    </appender>
+
+    <!-- 输出到文件 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 日志文件路径，如果文件不存在，会自动创建 -->
+        <file>${LOG_PATH}/${LOG_FILE}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>${FILE_LOG_PATTERN}</Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${FILE_LOG_THRESHOLD}</level>
+        </filter>
+    </appender>
+
+    <!-- 输出到文件，只记录 ERROR 级别的 -->
+    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>${FILE_LOG_PATTERN}</Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!--
+    根记录器配置，设置为较高的日志级别，以减少不必要的日志输出。
+    所有没有特别配置的 logger 都会使用 <root> 的配置。
+    -->
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="FILE_ERROR"/>
+    </root>
+
+    <!-- 应用程序的 logger 配置 -->
+    <logger name="com.fairyland" level="debug" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="FILE_ERROR"/>
+    </logger>
+</configuration>
